@@ -1,5 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   IonButton,
   IonContent,
@@ -11,6 +12,11 @@ import {
   IonSpinner,
   IonTitle,
   IonToolbar,
+  IonSearchbar,
+  IonSelect,
+  IonSelectOption,
+  AlertController,
+  ToastController,
 } from '@ionic/angular';
 import { CounterService } from '../services/counter.service';
 
@@ -18,8 +24,10 @@ import { CounterService } from '../services/counter.service';
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
+  standalone: true,
   imports: [
     DatePipe,
+    FormsModule,
     IonButton,
     IonContent,
     IonHeader,
@@ -30,17 +38,24 @@ import { CounterService } from '../services/counter.service';
     IonSpinner,
     IonTitle,
     IonToolbar,
+    IonSearchbar,
+    IonSelect,
+    IonSelectOption,
   ],
 })
 export class Tab2Page implements OnInit {
   readonly counterService = inject(CounterService);
+  private alertController = inject(AlertController);
+  private toastController = inject(ToastController);
+
+  // Stavy pro vyhledávání a řazení
+  searchTerm = signal('');
+  sortBy = signal<'date-desc' | 'date-asc' | 'name' | 'value'>('date-desc');
 
   async ngOnInit(): Promise<void> {
     await this.counterService.initialize();
   }
 
-<<<<<<< HEAD
-=======
   // Bonus 1: Celkový součet hodnot
   totalSum = computed(() => {
     return this.counterService.counters().reduce((sum, item) => sum + item.value, 0);
@@ -83,15 +98,16 @@ export class Tab2Page implements OnInit {
   });
 
   // Smazání jednoho záznamu + Toast notifikace
->>>>>>> cc9cf5e (Dokončení CV4 + bonusy)
   async remove(id: string): Promise<void> {
     await this.counterService.remove(id);
+    this.showToast('Záznam byl úspěšně odstraněn.');
   }
 
-<<<<<<< HEAD
+  // Propojení s tlačítkem v HTML šabloně pro vymazání celé historie
   async clear(): Promise<void> {
-    await this.counterService.clear();
-=======
+    await this.confirmClear();
+  }
+
   async confirmClear(): Promise<void> {
     const alert = await this.alertController.create({
       header: 'Potvrzení mazání',
@@ -120,6 +136,5 @@ export class Tab2Page implements OnInit {
       position: 'bottom',
     });
     await toast.present();
->>>>>>> cc9cf5e (Dokončení CV4 + bonusy)
   }
 }

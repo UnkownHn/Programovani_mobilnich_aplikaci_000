@@ -13,15 +13,34 @@
   } @else if (counterService.counters().length === 0) {
     <p class="state-message">Historie je zatím prázdná.</p>
   } @else {
+    <!-- Vyhledávání podle názvu -->
+    <ion-searchbar [(ngModel)]="searchTerm" placeholder="Hledat podle názvu..."></ion-searchbar>
+
+    <!-- Řazení historie -->
+    <ion-item>
+      <ion-select [(ngModel)]="sortBy" label="Seřadit podle">
+        <ion-select-option value="date-desc">Od nejnovějšího</ion-select-option>
+        <ion-select-option value="date-asc">Od nejstaršího</ion-select-option>
+        <ion-select-option value="name">Podle názvu</ion-select-option>
+        <ion-select-option value="value">Podle hodnoty</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- Statistiky (Celkový součet a Varianta A - Průměr) -->
+    <div class="ion-padding" style="margin: 10px 0; background: var(--ion-color-light, #f4f5f8); border-radius: 8px;">
+      <p style="margin: 0 0 5px 0;"><strong>Celkový součet hodnot:</strong> {{ totalSum() }}</p>
+      <p style="margin: 0;"><strong>Průměr hodnot:</strong> {{ averageValue() }}</p>
+    </div>
+
     <div class="history-header">
-      <p>Počet záznamů: {{ counterService.counters().length }}</p>
+      <p>Zobrazeno záznamů: {{ filteredCounters().length }} z {{ counterService.counters().length }}</p>
       <ion-button color="danger" fill="outline" size="small" (click)="clear()">
         Vymazat vše
       </ion-button>
     </div>
 
     <ion-list>
-      @for (counter of counterService.counters(); track counter.id) {
+      @for (counter of filteredCounters(); track counter.id) {
         <ion-item>
           <ion-label>
             <h2>{{ counter.name }}</h2>
